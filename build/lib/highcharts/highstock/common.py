@@ -1,7 +1,6 @@
-#!/usr/bin/python
 # -*- coding: UTF-8 -*-
-""" Python-Highcharts common.py
-Common Functions For Highcharts
+""" Python-Highstock common.py
+Common Functions For Highstock
 """
 from past.builtins import basestring
 import datetime
@@ -352,34 +351,34 @@ class Events(CommonObject):
     ALLOWED_OPTIONS = {
         "addSeries": (JSfunction, basestring),
         "afterPrint": (JSfunction, basestring),
+        "afterBreaks": (JSfunction, basestring),
+        "afterSetExtremes": (JSfunction, basestring),
+        "afterAnimate": (JSfunction, basestring),
         "beforePrint": (JSfunction, basestring),
+        "checkboxClick": (JSfunction, basestring),
         "click": (JSfunction, basestring),
         "drilldown": (JSfunction, basestring),
         "drillup": (JSfunction, basestring),
         "load": (JSfunction, basestring),
-        "redraw": (JSfunction, basestring),
-        "selection": (JSfunction, basestring),
-        "afterAnimate": (JSfunction, basestring),
-        "checkboxClick": (JSfunction, basestring),
         "hide": (JSfunction, basestring),
         "legendItemClick": (JSfunction, basestring),
         "mouseOut": (JSfunction, basestring),
         "mouseOver": (JSfunction, basestring),
-        "show": (JSfunction, basestring),
+        "pointBreak": (JSfunction, basestring),
         "remove": (JSfunction, basestring),
+        "redraw": (JSfunction, basestring),
+        "selection": (JSfunction, basestring),
+        "show": (JSfunction, basestring),
         "select": (JSfunction, basestring),
         "unselect": (JSfunction, basestring),
         "update": (JSfunction, basestring),
-        "afterBreaks": (JSfunction, basestring),
-        "afterSetExtremes": (JSfunction, basestring),
-        "pointBreak": (JSfunction, basestring),
         "setExtremes": (JSfunction, basestring)
     }
 
 
 class Point(CommonObject):
     ALLOWED_OPTIONS = {
-        "events": (Events, dict)
+        "events": Events
     }
 
 
@@ -416,42 +415,13 @@ class ContextButton(CommonObject):
     }
 
 
-class Back(CommonObject):
-    ALLOWED_OPTIONS = {
-        "color": (ColorObject, basestring, dict),
-        "size": [int, float]
-    }
-
-
-class Bottom(CommonObject):
-    ALLOWED_OPTIONS = {
-        "color": (ColorObject, basestring, dict),
-        "size": [int, float]
-    }
-
-
-class Side(CommonObject):
-    ALLOWED_OPTIONS = {
-        "color": (ColorObject, basestring, dict),
-        "size": [int, float]
-    }
-
-
-class Frame(CommonObject):
-    ALLOWED_OPTIONS = {
-        "back": (Back, dict),
-        "bottom": (Bottom, dict),
-        "side": (Side, dict),
-    }
-
-
 class Options3d(CommonObject):
     ALLOWED_OPTIONS = {
         "alpha": [float, int],
         "beta": [float, int],
         "depth": int,
         "enabled": bool,
-        "frame": (Frame, dict),
+        "frame": NotImplemented,  # FrameObject
         "viewDistance": int
     }
 
@@ -462,14 +432,6 @@ class ResetZoomButton(CommonObject):
         "relativeTo": basestring,
         "theme": NotImplemented  # ThemeObject
     }
-
-
-class DrillUpButton(CommonObject):
-    ALLOWED_OPTIONS = {
-        "position": (Position, dict),
-        "relativeTo": basestring,
-        "theme": NotImplemented  # ThemeObject
-    },
 
 
 class Labels(CommonObject):
@@ -531,6 +493,13 @@ class Navigation(CommonObject):
     }
 
 
+class Handles(CommonObject):
+    ALLOWED_OPTIONS = {
+        "backgroundColor": (ColorObject, basestring, dict),
+        "borderColor": (ColorObject, basestring, dict),
+    }
+
+
 class DateTimeLabelFormats(CommonObject):
     ALLOWED_OPTIONS = {
         "millisecond": basestring,
@@ -541,6 +510,18 @@ class DateTimeLabelFormats(CommonObject):
         "week": basestring,
         "month": basestring,
         "year": basestring,
+    }
+
+
+class DataGrouping(CommonObject):
+    ALLOWED_OPTIONS = {
+        "approximation": (JSfunction, basestring),
+        "dateTimeLabelFormats": (DateTimeLabelFormats, dict),
+        "enabled": bool,
+        "forced": bool,
+        "groupPixelWidth": [int, float],
+        "smoothed": bool,
+        "units": list,
     }
 
 
@@ -594,7 +575,6 @@ class Hover(CommonObject):
         "marker": (Marker, dict),
         "radius": int,
         "radiusPlus": int,
-        "color": (ColorObject, basestring, dict),
     }
 
 
@@ -620,6 +600,17 @@ class Tooltip(CommonObject):
         "valuePrefix": basestring,
         "valueSuffix": basestring,
         "xDateFormat": basestring
+    }
+
+
+class Shadow(CommonObject):
+    # not in use yet... not sure hot wo implement
+    ALLOWED_OPTIONS = {
+        "color": (ColorObject, dict),
+        "offsetX": [int, float],
+        "offsetY": [int, float],
+        "opacity": [int, float],
+        "width": [int, float],
     }
 
 
@@ -657,6 +648,8 @@ class ArrayObject(object):
 
     def process_kwargs(self, kwargs):
         temp = {}
+        print(kwargs)
+        print(self.ALLOWED_OPTIONS)
         for k, v in kwargs.items():
             if k in self.ALLOWED_OPTIONS:
                 if self.__validate_options__(k, v, self.ALLOWED_OPTIONS[k]):
@@ -696,7 +689,7 @@ class PlotBands(ArrayObject):
 class PlotLines(ArrayObject):
     ALLOWED_OPTIONS = {
         "color": (ColorObject, basestring, dict),
-        "dashStyle": basestring,
+        "dashStyle": int,
         "events": (Events, dict),
         "id": basestring,
         "label": (Labels, dict),
@@ -728,18 +721,18 @@ class Background(ArrayObject):
 class Breaks(ArrayObject):
     ALLOWED_OPTIONS = {
         "breakSize": int,
-        "from": [int, float],
+        "from": [int, float, datetime.datetime],
         "repeat": int,
-        "to": [int, float],
+        "to": [int, float, datetime.datetime],
     }
 
 
-class DataClasses(ArrayObject):
+class Buttons(ArrayObject):
     ALLOWED_OPTIONS = {
-        "color": (ColorObject, basestring, dict),
-        "from": [int, float],
-        "name": basestring,
-        "to": [int, float],
+        "type": basestring,
+        "count": [int, float],
+        "text": basestring,
+        "dataGrouping": (DataGrouping, dict)
     }
 
 
@@ -768,7 +761,7 @@ class Levels(ArrayObject):
 IDV_OBJECT_LIST = [JSfunction, Formatter, Halo, Marker, Labels,
                    Position, Hover, Select, Events, States, ContextButton,
                    CSSObject, SVGObject, ColorObject,
-                   RawJavaScriptText, DateTimeLabelFormats]
+                   RawJavaScriptText, DateTimeLabelFormats, DataGrouping]
 
 
 class OptionTypeError(Exception):
