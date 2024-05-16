@@ -7,12 +7,15 @@ from .common import Formatter, Events, Position, ContextButton, Options3d, Reset
     DateTimeLabelFormats, Zones, Levels, Buttons, \
     JSfunction, ColorObject, CSSObject, SVGObject, CommonObject, ArrayObject
 
-import json, datetime
+import json
+import datetime
 
 # Base Option Class
+
+
 class BaseOptions(object):
 
-    def __init__(self,**kwargs):
+    def __init__(self, **kwargs):
         self.update_dict(**kwargs)
 
     def __display_options__(self):
@@ -22,53 +25,53 @@ class BaseOptions(object):
         return self.__dict__
 
     def __validate_options__(self, k, v, ov):
-        if ov == NotImplemented: 
+        if ov == NotImplemented:
             raise OptionTypeError("Option Type Currently Not Supported: %s" % k)
-        if isinstance(v,dict) and isinstance(ov,dict):
+        if isinstance(v, dict) and isinstance(ov, dict):
             keys = v.keys()
-            if len(keys) > 1: 
+            if len(keys) > 1:
                 raise NotImplementedError
-            return isinstance(v[keys[0]],ov[keys[0]])
-        return isinstance(v, ov) 
+            return isinstance(v[keys[0]], ov[keys[0]])
+        return isinstance(v, ov)
 
     def update_dict(self, **kwargs):
-        for k, v in kwargs.items(): 
+        for k, v in kwargs.items():
             if k in self.ALLOWED_OPTIONS:
-                #if isinstance(self.ALLOWED_OPTIONS[k], tuple) and isinstance(self.ALLOWED_OPTIONS[k][0](), SeriesOptions):
+                # if isinstance(self.ALLOWED_OPTIONS[k], tuple) and isinstance(self.ALLOWED_OPTIONS[k][0](), SeriesOptions):
                 if k in PlotOptions.ALLOWED_OPTIONS.keys():
                     if self.__getattr__(k):
                         self.__dict__[k].update(series_type=k, **v)
                     else:
                         v = SeriesOptions(series_type=k, **v)
-                        self.__dict__.update({k:v})
+                        self.__dict__.update({k: v})
 
                 elif isinstance(self.ALLOWED_OPTIONS[k], tuple) and isinstance(self.ALLOWED_OPTIONS[k][0](), CommonObject):
-                    if isinstance(v, dict): 
-                        if self.__getattr__(k): 
-                            self.__dict__[k].update(v) #update dict
-                        else: # first
-                            self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](**v)})
+                    if isinstance(v, dict):
+                        if self.__getattr__(k):
+                            self.__dict__[k].update(v)  # update dict
+                        else:  # first
+                            self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](**v)})
                     else:
                         OptionTypeError("Not An Accepted Input Type: %s, must be dictionary" % type(v))
 
                 elif isinstance(self.ALLOWED_OPTIONS[k], tuple) and isinstance(self.ALLOWED_OPTIONS[k][0](), ArrayObject):
-                    if self.__getattr__(k): #existing attr
+                    if self.__getattr__(k):  # existing attr
                         if isinstance(v, dict):
-                            self.__dict__[k].update(v) # update array
+                            self.__dict__[k].update(v)  # update array
                         elif isinstance(v, list):
                             for item in v:
-                                self.__dict__[k].update(item) # update array
+                                self.__dict__[k].update(item)  # update array
                         else:
-                            OptionTypeError("Not An Accepted Input Type: %s, must be list or dictionary" 
-                                            % type(v))          
-                    else: #first 
+                            OptionTypeError("Not An Accepted Input Type: %s, must be list or dictionary"
+                                            % type(v))
+                    else:  # first
                         if isinstance(v, dict):
-                            self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](**v)})
+                            self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](**v)})
                         elif isinstance(v, list):
                             if len(v) == 1:
-                                self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](**v[0])})
+                                self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](**v[0])})
                             else:
-                                self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](**v[0])})
+                                self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](**v[0])})
                                 for item in v[1:]:
                                     self.__dict__[k].update(item)
                         else:
@@ -76,36 +79,35 @@ class BaseOptions(object):
                                             % type(v))
 
                 elif isinstance(self.ALLOWED_OPTIONS[k], tuple) and \
-                    (isinstance(self.ALLOWED_OPTIONS[k][0](), CSSObject) or isinstance(self.ALLOWED_OPTIONS[k][0](), SVGObject)):
-                    if self.__getattr__(k): 
-                        for key, value in v.items(): # check if v has object input 
-                            self.__dict__[k].__options__().update({key:value})
-                        
+                        (isinstance(self.ALLOWED_OPTIONS[k][0](), CSSObject) or isinstance(self.ALLOWED_OPTIONS[k][0](), SVGObject)):
+                    if self.__getattr__(k):
+                        for key, value in v.items():  # check if v has object input
+                            self.__dict__[k].__options__().update({key: value})
+
                         v = self.__dict__[k].__options__()
                     # upating object
                     if isinstance(v, dict):
-                        self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](**v)})
+                        self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](**v)})
                     else:
-                        self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](v)})
+                        self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](v)})
 
-                elif isinstance(self.ALLOWED_OPTIONS[k], tuple) and (isinstance(self.ALLOWED_OPTIONS[k][0](), JSfunction) or \
-                    isinstance(self.ALLOWED_OPTIONS[k][0](), Formatter) or isinstance(self.ALLOWED_OPTIONS[k][0](), ColorObject)):
+                elif isinstance(self.ALLOWED_OPTIONS[k], tuple) and (isinstance(self.ALLOWED_OPTIONS[k][0](), JSfunction) or
+                                                                     isinstance(self.ALLOWED_OPTIONS[k][0](), Formatter) or isinstance(self.ALLOWED_OPTIONS[k][0](), ColorObject)):
                     if isinstance(v, dict):
-                        self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](**v)})
+                        self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](**v)})
                     else:
-                        self.__dict__.update({k:self.ALLOWED_OPTIONS[k][0](v)})
+                        self.__dict__.update({k: self.ALLOWED_OPTIONS[k][0](v)})
                 else:
-                    self.__dict__.update({k:v})
+                    self.__dict__.update({k: v})
 
             else:
                 print(self.ALLOWED_OPTIONS)
                 print(k, v)
                 raise OptionTypeError("Not An Accepted Option Type: %s" % k)
 
-
     def __getattr__(self, item):
         if not item in self.__dict__:
-            return None # Attribute Not Set
+            return None  # Attribute Not Set
         else:
             return True
 
@@ -121,7 +123,7 @@ class ChartOptions(BaseOptions):
         "className": basestring,
         "defaultSeriesType": basestring,
         "events": (Events, dict),
-        "height": [int,basestring],
+        "height": [int, basestring],
         "ignoreHiddenSeries": bool,
         "inverted": bool,
         "margin": list,
@@ -129,7 +131,7 @@ class ChartOptions(BaseOptions):
         "marginLeft": int,
         "marginRight": int,
         "marginTop": int,
-        "options3d": (Options3d, dict), 
+        "options3d": (Options3d, dict),
         "plotBackgroundColor": (ColorObject, basestring, dict),
         "plotBackgroundImage": basestring,
         "plotBorderColor": (ColorObject, basestring, dict),
@@ -148,13 +150,14 @@ class ChartOptions(BaseOptions):
         "spacingTop": int,
         "style": (CSSObject, dict),
         "type": basestring,
-        "width": [int,basestring],
+        "width": [int, basestring],
         "zoomType": basestring,
     }
 
 
 class ColorsOptions(BaseOptions):
     """ Special Case, this is simply just an array of colours """
+
     def __init__(self):
         self.colors = {}
 
@@ -162,7 +165,7 @@ class ColorsOptions(BaseOptions):
         if isinstance(colors, basestring):
             self.colors = ColorObject(colors)
         elif isinstance(colors, list) or isinstance(colors, dict):
-            self.colors  = colors
+            self.colors = colors
         else:
             OptionTypeError("Not An Accepted Input Type: %s" % type(colors))
 
@@ -174,7 +177,7 @@ class CreditsOptions(BaseOptions):
     ALLOWED_OPTIONS = {
         "enabled": bool,
         "href": basestring,
-        "position": (Position, dict), 
+        "position": (Position, dict),
         "style": (CSSObject, dict),
         "text": basestring,
     }
@@ -183,7 +186,7 @@ class CreditsOptions(BaseOptions):
 class ExportingOptions(BaseOptions):
     ALLOWED_OPTIONS = {
         "buttons": (ContextButton, dict),
-        "chartOptions": (ChartOptions, dict), 
+        "chartOptions": (ChartOptions, dict),
         "enabled": bool,
         "filename": basestring,
         "formAttributes": NotImplemented,
@@ -313,6 +316,7 @@ class PlotOptions(BaseOptions):
         "spline": (SeriesOptions, dict),
     }
 
+
 class RangeSelectorOptions(BaseOptions):
     ALLOWED_OPTIONS = {
         "allButtonsEnabled": bool,
@@ -331,7 +335,9 @@ class RangeSelectorOptions(BaseOptions):
         "inputStyle": (CSSObject, dict),
         "labelStyle": (CSSObject, dict),
         "selected": [int, float],
+        "dropdown": basestring
     }
+
 
 class ScrollbarOptions(BaseOptions):
     ALLOWED_OPTIONS = {
@@ -355,10 +361,12 @@ class ScrollbarOptions(BaseOptions):
         "trackBorderWidth": [int, float],
     }
 
+
 class SeriesData(BaseOptions):
     """ Another Special Case: Stores Data Series in an array for returning to the chart object """
+
     def __init__(self):
-        #self.__dict__.update([])
+        # self.__dict__.update([])
         self = []
 
 
@@ -422,11 +430,11 @@ class xAxisOptions(BaseOptions):
     ALLOWED_OPTIONS = {
         "allowDecimals": bool,
         "alternateGridColor": (ColorObject, basestring, dict),
-        "breaks":(Breaks, list),
+        "breaks": (Breaks, list),
         "categories": list,
         'crosshair': bool,
         "dateTimeLabelFormats": (DateTimeLabelFormats, dict),
-        "endOnTick": bool, 
+        "endOnTick": bool,
         "events": (Events, dict),
         "gridLineColor": (ColorObject, basestring, dict),
         "gridLineDashStyle": basestring,
@@ -483,6 +491,7 @@ class yAxisOptions(BaseOptions):
         "alternateGridColor": (ColorObject, basestring, dict),
         "breaks": (Breaks, list),
         "categories": list,
+        'crosshair': [bool, dict],
         "ceiling": (int, float),
         "dateTimeLabelFormats": (DateTimeLabelFormats, dict),
         "endOnTick": bool,
@@ -547,7 +556,7 @@ class yAxisOptions(BaseOptions):
         # shared code.  This permits logarithmic Y-Axis scale which is
         # frequently useful in stock charts.
         "type": basestring,
-        "units": list    
+        "units": list
     }
 
 
@@ -556,7 +565,7 @@ class NavigatorOptions(BaseOptions):
         "adaptToUpdatedData": bool,
         "baseSeries": [int, basestring],
         "enabled": bool,
-        "handles": (Handles, dict), # need handles object
+        "handles": (Handles, dict),  # need handles object
         "height": [int, float],
         "margin": [int, float],
         "maskFill": (ColorObject, dict),
@@ -567,7 +576,7 @@ class NavigatorOptions(BaseOptions):
         "xAxis": (xAxisOptions, dict),
         "yAxis": (yAxisOptions, dict),
     }
-    
+
 
 class MultiAxis(object):
 
@@ -575,13 +584,12 @@ class MultiAxis(object):
         AXIS_LIST = {
             "xAxis": xAxisOptions,
             "yAxis": yAxisOptions
-            }
+        }
         self.axis = []
         self.AxisObj = AXIS_LIST[axis]
 
     def update(self, **kwargs):
         self.axis.append(self.AxisObj(**kwargs))
-        
+
     def __jsonable__(self):
         return self.axis
-

@@ -319,8 +319,6 @@ class CommonObject(object):
     def process_kwargs(self, kwargs):
 
         for k, v in kwargs.items():
-            print(kwargs)
-            print(self.ALLOWED_OPTIONS)
             if k in self.ALLOWED_OPTIONS:
                 if self.__validate_options__(k, v, self.ALLOWED_OPTIONS[k]):
                     if isinstance(self.ALLOWED_OPTIONS[k], tuple) and \
@@ -650,8 +648,6 @@ class ArrayObject(object):
 
     def process_kwargs(self, kwargs):
         temp = {}
-        print(kwargs)
-        print(self.ALLOWED_OPTIONS)
         for k, v in kwargs.items():
             if k in self.ALLOWED_OPTIONS:
                 if self.__validate_options__(k, v, self.ALLOWED_OPTIONS[k]):

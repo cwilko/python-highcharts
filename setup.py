@@ -5,7 +5,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 ns = {}
 with open(os.path.join(here, 'highcharts', 'version.py')) as f:
-   exec(f.read(), {}, ns)
+    exec(f.read(), {}, ns)
 
 setup(
     name='python-highcharts',
@@ -19,14 +19,14 @@ setup(
         'highcharts.highstock': ['templates/*.html']
     },
     url='https://github.com/kyper-data/python-highcharts',
-    download_url='https://github.com/kyper-data/python-highcharts/tarball/' + ns['__version__'],
+    #download_url='https://github.com/kyper-data/python-highcharts/tarball/' + ns['__version__'],
     description='Python Highcharts wrapper',
     install_requires=[
         "Jinja2",
         "future"
     ],
-    keywords = ['python', 'ipython', 'highcharts', 'chart', 'visualization', 'graph', 'javascript', 'html'],
-    classifiers         = [
+    keywords=['python', 'ipython', 'highcharts', 'chart', 'visualization', 'graph', 'javascript', 'html'],
+    classifiers=[
         'Framework :: IPython',
         'Intended Audience :: Developers',
         'Intended Audience :: Financial and Insurance Industry',
