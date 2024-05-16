@@ -727,10 +727,17 @@ class Breaks(ArrayObject):
 
 class Buttons(ArrayObject):
     ALLOWED_OPTIONS = {
+<<<<<<< HEAD
         "type": basestring,
         "count": [int, float],
         "text": basestring,
         "dataGrouping": (DataGrouping, dict)
+=======
+    "type": basestring,
+    "count": [int, float],
+    "text": basestring,
+    "dataGrouping": (DataGrouping, dict)
+>>>>>>> 35118fc6c90e834a128d8188db204d1907e88698
     }
 
 
